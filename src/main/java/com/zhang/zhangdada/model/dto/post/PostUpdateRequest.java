@@ -6,7 +6,7 @@ import lombok.Data;
 
 /**
  * 更新请求
-
+ *
  */
 @Data
 public class PostUpdateRequest implements Serializable {
