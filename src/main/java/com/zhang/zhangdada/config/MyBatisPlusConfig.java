@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 public class MyBatisPlusConfig {
 
     /**
-     * 拦截器配置。
+     * 拦截器配置。。
      *
      * @return
      */
