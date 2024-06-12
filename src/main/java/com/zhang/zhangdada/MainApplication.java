@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * 主类（项目启动入口）
  *
  */
-// todo 如需开启 Redis，须移除 exclude 中的内容
 @SpringBootApplication(exclude = {RedisAutoConfiguration.class})
 @MapperScan("com.zhang.zhangdada.mapper")
 @EnableScheduling
@@ -21,8 +20,7 @@ public class MainApplication {
     public static void main(String[] args) {
         SpringApplication.run(MainApplication.class, args);
         System.out.println("启动成功啦啦！！！！！！！！！");
-
-        System.out.println("这是master");
+        System.out.println("静姐！！！！！！！！！！！！！！");
 
     }
 

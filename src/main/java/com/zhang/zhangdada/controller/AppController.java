@@ -2,9 +2,11 @@ package com.zhang.zhangdada.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.zhang.zhangdada.annotation.AuthCheck;
 import com.zhang.zhangdada.common.BaseResponse;
 import com.zhang.zhangdada.common.ErrorCode;
 import com.zhang.zhangdada.common.ResultUtils;
+import com.zhang.zhangdada.constant.UserConstant;
 import com.zhang.zhangdada.exception.ThrowUtils;
 import com.zhang.zhangdada.model.dto.app.AppAddRequest;
 import com.zhang.zhangdada.model.dto.app.AppUpdateRequest;
@@ -50,7 +52,9 @@ public class AppController {
 
         return ResultUtils.success(app.getId());
 
-    }@PostMapping("updateApp")
+    }
+    @PostMapping("updateApp")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> addApp(@RequestBody AppUpdateRequest appUpdateRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(appUpdateRequest ==null, ErrorCode.PARAMS_ERROR);
 
@@ -83,4 +87,6 @@ public class AppController {
         return ResultUtils.success(true);
 
     }
+
+    //todo  delete query
 }
