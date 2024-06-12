@@ -46,8 +46,6 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App>
             ThrowUtils.throwIf(!"1".equals(reviewStatus),
                     ErrorCode.OPERATION_ERROR,"应用审核未通过");
 
-
-
         }
     }
 
