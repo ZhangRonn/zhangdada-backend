@@ -103,6 +103,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         // 3. 记录用户的登录态
         request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        Object attribute = request.getSession().getAttribute(USER_LOGIN_STATE);
+        System.out.println(attribute.toString());
         return this.getLoginUserVO(user);
     }
 

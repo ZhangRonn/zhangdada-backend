@@ -65,6 +65,7 @@ public class QuestionController {
         ThrowUtils.throwIf(!save,ErrorCode.SYSTEM_ERROR,"添加失败");
 
         return ResultUtils.success(question.getId());
-
     }
+
+//    todo update delete query
 }

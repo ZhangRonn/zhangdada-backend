@@ -43,8 +43,8 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App>
                     ErrorCode.PARAMS_ERROR, "应用类型枚举不能为空");
             ThrowUtils.throwIf(AppScoringStrategyEnum.getEnumByValue(scoringStrategy)==null,
                     ErrorCode.PARAMS_ERROR,"应用评分标准不能为空");
-            ThrowUtils.throwIf(!"1".equals(reviewStatus),
-                    ErrorCode.OPERATION_ERROR,"应用审核未通过");
+//            ThrowUtils.throwIf(reviewStatus!=1,
+//                    ErrorCode.OPERATION_ERROR,"应用审核未通过");
 
         }
     }

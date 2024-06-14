@@ -1,6 +1,7 @@
 package com.zhang.zhangdada.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.zhang.zhangdada.annotation.AuthCheck;
 import com.zhang.zhangdada.common.BaseResponse;
@@ -9,6 +10,7 @@ import com.zhang.zhangdada.common.ResultUtils;
 import com.zhang.zhangdada.constant.UserConstant;
 import com.zhang.zhangdada.exception.ThrowUtils;
 import com.zhang.zhangdada.model.dto.app.AppAddRequest;
+import com.zhang.zhangdada.model.dto.app.AppQueryRequest;
 import com.zhang.zhangdada.model.dto.app.AppUpdateRequest;
 import com.zhang.zhangdada.model.entity.App;
 import com.zhang.zhangdada.model.entity.User;
@@ -16,10 +18,7 @@ import com.zhang.zhangdada.model.enums.ReviewStatusEnum;
 import com.zhang.zhangdada.service.AppService;
 import com.zhang.zhangdada.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -35,12 +34,12 @@ public class AppController {
     @Resource
     UserService userService;
 
-    @PostMapping("addApp")
+    @PostMapping("/addApp")
     public BaseResponse<Long> addApp(@RequestBody AppAddRequest appAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(appAddRequest==null, ErrorCode.PARAMS_ERROR);
         App app = new App();
         BeanUtil.copyProperties(appAddRequest,app);
-
+        app.setReviewStatus(1);
         appService.validApp(app,true);
 
         User loginUser = userService.getLoginUser(request);
@@ -53,9 +52,9 @@ public class AppController {
         return ResultUtils.success(app.getId());
 
     }
-    @PostMapping("updateApp")
+    @PostMapping("/updateApp")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Boolean> addApp(@RequestBody AppUpdateRequest appUpdateRequest, HttpServletRequest request) {
+    public BaseResponse<Boolean> updateApp(@RequestBody AppUpdateRequest appUpdateRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(appUpdateRequest ==null, ErrorCode.PARAMS_ERROR);
 
         App app = new App();
@@ -85,6 +84,25 @@ public class AppController {
         boolean update = appService.update(appUpdateWrapper);
         ThrowUtils.throwIf(!update,ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
+
+    }
+    @GetMapping("/queryApp")
+    public BaseResponse<Boolean> queryApp(@RequestBody AppQueryRequest appQueryRequest, HttpServletRequest request) {
+        App app = new App();
+        BeanUtil.copyProperties(appQueryRequest,app);
+        app.setReviewStatus(1);
+        appService.validApp(app,true);
+
+        User loginUser = userService.getLoginUser(request);
+        app.setId(loginUser.getId());
+        app.setReviewStatus(ReviewStatusEnum.PASS.getValue());
+        QueryWrapper<App> appQueryWrapper = new QueryWrapper<>();
+        appQueryWrapper.eq("id", appQueryRequest.getId());
+        App one = appService.getOne(appQueryWrapper);
+
+        ThrowUtils.throwIf(BeanUtil.isEmpty(one),ErrorCode.OPERATION_ERROR);
+        return ResultUtils.success(true);
+
 
     }
 
