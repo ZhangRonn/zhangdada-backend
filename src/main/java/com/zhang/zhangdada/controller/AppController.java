@@ -43,10 +43,11 @@ public class AppController {
         appService.validApp(app,true);
 
         User loginUser = userService.getLoginUser(request);
-        app.setId(loginUser.getId());
+        app.setUserId(loginUser.getId());
         app.setReviewStatus(ReviewStatusEnum.PASS.getValue());
 
         boolean result = appService.save(app);
+        System.out.println("11111");
         ThrowUtils.throwIf(!result,ErrorCode.OPERATION_ERROR);
 
         return ResultUtils.success(app.getId());
@@ -88,6 +89,7 @@ public class AppController {
     }
     @GetMapping("/queryApp")
     public BaseResponse<Boolean> queryApp(@RequestBody AppQueryRequest appQueryRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(appQueryRequest ==null, ErrorCode.PARAMS_ERROR);
         App app = new App();
         BeanUtil.copyProperties(appQueryRequest,app);
         app.setReviewStatus(1);
