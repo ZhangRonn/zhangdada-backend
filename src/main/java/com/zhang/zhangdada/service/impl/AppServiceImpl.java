@@ -2,6 +2,7 @@ package com.zhang.zhangdada.service.impl;
 import java.util.Date;
 
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import com.zhang.zhangdada.common.ErrorCode;
@@ -35,6 +36,12 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App>
         Integer appType = app.getAppType();
         Integer scoringStrategy = app.getScoringStrategy();
         Integer reviewStatus = app.getReviewStatus();
+
+        QueryWrapper<App> appQueryWrapper = new QueryWrapper<App>();
+        appQueryWrapper.eq("appName", appName);
+        long count = this.count(appQueryWrapper);
+        ThrowUtils.throwIf(count>0,ErrorCode.PARAMS_ERROR,"应用名已经存在");
+
         if (b) {
             ThrowUtils.throwIf(StrUtil.isEmpty(appName),ErrorCode.PARAMS_ERROR,"应用名不能为空");
             ThrowUtils.throwIf(StrUtil.isEmpty(appDesc),ErrorCode.PARAMS_ERROR,"应用描述不能为空");

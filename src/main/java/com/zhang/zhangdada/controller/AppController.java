@@ -3,6 +3,7 @@ package com.zhang.zhangdada.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zhang.zhangdada.annotation.AuthCheck;
 import com.zhang.zhangdada.common.BaseResponse;
 import com.zhang.zhangdada.common.ErrorCode;
@@ -42,12 +43,16 @@ public class AppController {
         app.setReviewStatus(1);
         appService.validApp(app,true);
 
+        QueryWrapper<App> appQueryWrapper = new QueryWrapper<App>();
+        appQueryWrapper.eq("appName",app.getAppName());
+        App one = appService.getOne(appQueryWrapper);
+        ThrowUtils.throwIf(one!=null,ErrorCode.PARAMS_ERROR,"应用名称已存在");
+
         User loginUser = userService.getLoginUser(request);
         app.setUserId(loginUser.getId());
         app.setReviewStatus(ReviewStatusEnum.PASS.getValue());
 
         boolean result = appService.save(app);
-        System.out.println("11111");
         ThrowUtils.throwIf(!result,ErrorCode.OPERATION_ERROR);
 
         return ResultUtils.success(app.getId());
@@ -63,49 +68,31 @@ public class AppController {
 
         appService.validApp(app,true);
 
+        User loginUser = userService.getLoginUser(request);
+        app.setUserId(loginUser.getId());
+        app.setReviewStatus(ReviewStatusEnum.PASS.getValue());
+
         Long id = appUpdateRequest.getId();
         App byId = appService.getById(id);
-        ThrowUtils.throwIf(byId==null,ErrorCode.NOT_FOUND_ERROR);
+        ThrowUtils.throwIf(BeanUtil.isEmpty(byId),ErrorCode.NOT_FOUND_ERROR);
 
-        String appName = appUpdateRequest.getAppName();
-        String appDesc = appUpdateRequest.getAppDesc();
-        String appIcon = appUpdateRequest.getAppIcon();
-        Integer appType = appUpdateRequest.getAppType();
-        Integer scoringStrategy = appUpdateRequest.getScoringStrategy();
-        Integer reviewStatus = appUpdateRequest.getReviewStatus();
 
-        UpdateWrapper<App> appUpdateWrapper = new UpdateWrapper<>();
-        appUpdateWrapper.eq("id", id);
-        appUpdateWrapper.eq("appDesc", appDesc);
-        appUpdateWrapper.eq("appIcon", appIcon);
-        appUpdateWrapper.eq("appType", appType);
-        appUpdateWrapper.eq("scoringStrategy", scoringStrategy);
-        appUpdateWrapper.eq("reviewStatus", reviewStatus);
-
-        boolean update = appService.update(appUpdateWrapper);
-        ThrowUtils.throwIf(!update,ErrorCode.OPERATION_ERROR);
+        boolean b = appService.updateById(app);
+        ThrowUtils.throwIf(!b,ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
 
     }
-    @GetMapping("/queryApp")
-    public BaseResponse<Boolean> queryApp(@RequestBody AppQueryRequest appQueryRequest, HttpServletRequest request) {
-        ThrowUtils.throwIf(appQueryRequest ==null, ErrorCode.PARAMS_ERROR);
-        App app = new App();
-        BeanUtil.copyProperties(appQueryRequest,app);
-        app.setReviewStatus(1);
-        appService.validApp(app,true);
 
-        User loginUser = userService.getLoginUser(request);
-        app.setId(loginUser.getId());
-        app.setReviewStatus(ReviewStatusEnum.PASS.getValue());
+    @PostMapping("/list/page")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Page<App>> listApp(@RequestBody AppQueryRequest appQueryRequest) {
+        int pageSize = appQueryRequest.getPageSize();
+        int current = appQueryRequest.getCurrent();
         QueryWrapper<App> appQueryWrapper = new QueryWrapper<>();
-        appQueryWrapper.eq("id", appQueryRequest.getId());
-        App one = appService.getOne(appQueryWrapper);
+        appQueryWrapper.eq("id",appQueryRequest.getId());
+        Page<App> page = appService.page(new Page<>(current, pageSize), appQueryWrapper);
 
-        ThrowUtils.throwIf(BeanUtil.isEmpty(one),ErrorCode.OPERATION_ERROR);
-        return ResultUtils.success(true);
-
-
+        return ResultUtils.success(page);
     }
 
     //todo  delete query
