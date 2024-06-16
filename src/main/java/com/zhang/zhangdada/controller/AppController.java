@@ -9,8 +9,10 @@ import com.zhang.zhangdada.common.BaseResponse;
 import com.zhang.zhangdada.common.ErrorCode;
 import com.zhang.zhangdada.common.ResultUtils;
 import com.zhang.zhangdada.constant.UserConstant;
+import com.zhang.zhangdada.exception.BusinessException;
 import com.zhang.zhangdada.exception.ThrowUtils;
 import com.zhang.zhangdada.model.dto.app.AppAddRequest;
+import com.zhang.zhangdada.model.dto.app.AppEditRequest;
 import com.zhang.zhangdada.model.dto.app.AppQueryRequest;
 import com.zhang.zhangdada.model.dto.app.AppUpdateRequest;
 import com.zhang.zhangdada.model.entity.App;
@@ -37,36 +39,37 @@ public class AppController {
 
     @PostMapping("/addApp")
     public BaseResponse<Long> addApp(@RequestBody AppAddRequest appAddRequest, HttpServletRequest request) {
-        ThrowUtils.throwIf(appAddRequest==null, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(appAddRequest == null, ErrorCode.PARAMS_ERROR);
         App app = new App();
-        BeanUtil.copyProperties(appAddRequest,app);
+        BeanUtil.copyProperties(appAddRequest, app);
         app.setReviewStatus(1);
-        appService.validApp(app,true);
+        appService.validApp(app, true);
 
         QueryWrapper<App> appQueryWrapper = new QueryWrapper<App>();
-        appQueryWrapper.eq("appName",app.getAppName());
+        appQueryWrapper.eq("appName", app.getAppName());
         App one = appService.getOne(appQueryWrapper);
-        ThrowUtils.throwIf(one!=null,ErrorCode.PARAMS_ERROR,"应用名称已存在");
+        ThrowUtils.throwIf(one != null, ErrorCode.PARAMS_ERROR, "应用名称已存在");
 
         User loginUser = userService.getLoginUser(request);
         app.setUserId(loginUser.getId());
         app.setReviewStatus(ReviewStatusEnum.PASS.getValue());
 
         boolean result = appService.save(app);
-        ThrowUtils.throwIf(!result,ErrorCode.OPERATION_ERROR);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
 
         return ResultUtils.success(app.getId());
 
     }
+
     @PostMapping("/updateApp")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateApp(@RequestBody AppUpdateRequest appUpdateRequest, HttpServletRequest request) {
-        ThrowUtils.throwIf(appUpdateRequest ==null, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(appUpdateRequest == null, ErrorCode.PARAMS_ERROR);
 
         App app = new App();
-        BeanUtil.copyProperties(appUpdateRequest,app);
+        BeanUtil.copyProperties(appUpdateRequest, app);
 
-        appService.validApp(app,true);
+        appService.validApp(app, true);
 
         User loginUser = userService.getLoginUser(request);
         app.setUserId(loginUser.getId());
@@ -74,11 +77,11 @@ public class AppController {
 
         Long id = appUpdateRequest.getId();
         App byId = appService.getById(id);
-        ThrowUtils.throwIf(BeanUtil.isEmpty(byId),ErrorCode.NOT_FOUND_ERROR);
+        ThrowUtils.throwIf(BeanUtil.isEmpty(byId), ErrorCode.NOT_FOUND_ERROR);
 
 
         boolean b = appService.updateById(app);
-        ThrowUtils.throwIf(!b,ErrorCode.OPERATION_ERROR);
+        ThrowUtils.throwIf(!b, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
 
     }
@@ -89,11 +92,36 @@ public class AppController {
         int pageSize = appQueryRequest.getPageSize();
         int current = appQueryRequest.getCurrent();
         QueryWrapper<App> appQueryWrapper = new QueryWrapper<>();
-        appQueryWrapper.eq("id",appQueryRequest.getId());
+        appQueryWrapper.eq("id", appQueryRequest.getId());
         Page<App> page = appService.page(new Page<>(current, pageSize), appQueryWrapper);
 
         return ResultUtils.success(page);
     }
 
+    @PostMapping("/editApp")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> editApp(@RequestBody AppEditRequest appEditRequest, HttpServletRequest request) {
+        if (BeanUtil.isEmpty(appEditRequest) || appEditRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"请求参数不能为空");
+        }
+        App app = new App();
+        BeanUtil.copyProperties(appEditRequest,app);
+
+        appService.validApp(app,true);
+
+        App oldApp = appService.getById(app.getId());
+        ThrowUtils.throwIf(BeanUtil.isEmpty(oldApp),ErrorCode.SYSTEM_ERROR,"要修改的app为空");
+
+        User loginUser = userService.getLoginUser(request);;
+
+        if (!oldApp.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+        app.setReviewStatus(ReviewStatusEnum.REVIEWING.getValue());
+
+        boolean b = appService.updateById(app);
+        ThrowUtils.throwIf(!b,ErrorCode.OPERATION_ERROR);
+        return ResultUtils.success(true);
+    }
     //todo  delete query
 }
