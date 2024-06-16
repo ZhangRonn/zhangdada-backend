@@ -2,9 +2,9 @@ package com.zhang.zhangdada.controller;
 import java.util.List;
 
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
+import com.zhang.zhangdada.annotation.AuthCheck;
 import com.zhang.zhangdada.common.ResultUtils;
+import com.zhang.zhangdada.constant.UserConstant;
 import com.zhang.zhangdada.model.dto.question.QuestionContentDTO;
 
 import com.zhang.zhangdada.common.BaseResponse;
@@ -20,10 +20,7 @@ import com.zhang.zhangdada.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -60,5 +57,15 @@ public class QuestionController {
         return ResultUtils.success(question.getId());
     }
 
+    @DeleteMapping("/deleteQuestion")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> deleteQuestion(@RequestParam Long questionId) {
+        ThrowUtils.throwIf(questionId == null, ErrorCode.PARAMS_ERROR);
+
+        boolean b = questionService.removeById(questionId);
+        ThrowUtils.throwIf(!b, ErrorCode.SYSTEM_ERROR, "删除失败");
+
+        return ResultUtils.success(true);
+    }
 //    todo update delete query
 }
