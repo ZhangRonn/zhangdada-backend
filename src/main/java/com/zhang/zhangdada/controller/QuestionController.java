@@ -53,13 +53,8 @@ public class QuestionController {
         List<QuestionContentDTO> questionContent = questionAddRequest.getQuestionContent();
         Question question = new Question();
         question.setQuestionContent(JSONUtil.toJsonStr(questionContent));
-//        根据用户id获取应用实体
-        QueryWrapper<App> appQueryWrapper = new QueryWrapper<>();
-        appQueryWrapper.eq("userId", userId);
-        App one = appService.getOne(appQueryWrapper);
-
-        question.setAppId(one.getId());
-
+        question.setAppId(questionAddRequest.getAppId());
+        question.setUserId(userId);
 
         boolean save = questionService.save(question);
         ThrowUtils.throwIf(!save,ErrorCode.SYSTEM_ERROR,"添加失败");
