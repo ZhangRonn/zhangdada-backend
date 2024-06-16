@@ -76,17 +76,15 @@ public class UserAnswerController {
     BeanUtil.copyProperties(userAnswerUpdateRequest,userAnswer);
     userAnswerService.validUserAnswer(userAnswer);
 
-//    User loginUser = userService.getLoginUser(request);
-
-    try {
-        boolean b = userAnswerService.updateById(userAnswer);
-        if (!b) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR, "更新失败");
+        try {
+            boolean b = userAnswerService.updateById(userAnswer);
+            if (!b) {
+                throw new BusinessException(ErrorCode.OPERATION_ERROR, "修改失败");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-    } catch (Exception e) {
-        throw new RuntimeException(e);
-    }
-    return ResultUtils.success(true);
+        return ResultUtils.success(true);
 }
 
 }
