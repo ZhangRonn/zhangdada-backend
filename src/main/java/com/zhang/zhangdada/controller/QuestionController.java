@@ -38,8 +38,6 @@ public class QuestionController {
         @Resource
         private UserService userService;
 
-        @Autowired
-        private AppService  appService;
     @PostMapping("/addQuestion")
     public BaseResponse<Long> addQuestion(@RequestBody QuestionAddRequest questionAddRequest, HttpServletRequest request){
 
