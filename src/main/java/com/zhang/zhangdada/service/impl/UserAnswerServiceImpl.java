@@ -30,7 +30,6 @@ public class UserAnswerServiceImpl extends ServiceImpl<UserAnswerMapper, UserAns
      Integer resultScore = userAnswer.getResultScore();
      Long userId = userAnswer.getUserId();
 
-
     }
 }
 

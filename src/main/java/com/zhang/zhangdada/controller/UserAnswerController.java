@@ -8,6 +8,7 @@ import com.zhang.zhangdada.common.ResultUtils;
 import com.zhang.zhangdada.exception.BusinessException;
 import com.zhang.zhangdada.exception.ThrowUtils;
 import com.zhang.zhangdada.model.dto.userAnswer.UserAnswerAddRequest;
+import com.zhang.zhangdada.model.dto.userAnswer.UserAnswerUpdateRequest;
 import com.zhang.zhangdada.model.entity.App;
 import com.zhang.zhangdada.model.entity.User;
 import com.zhang.zhangdada.model.entity.UserAnswer;
@@ -17,9 +18,7 @@ import com.zhang.zhangdada.service.UserAnswerService;
 import com.zhang.zhangdada.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -69,5 +68,25 @@ public class UserAnswerController {
 
         return ResultUtils.success(true);
     }
+    @PostMapping("/updateUserAnswer")
+    public BaseResponse<Boolean> updateUserAnswer(@RequestBody UserAnswerUpdateRequest userAnswerUpdateRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(userAnswerUpdateRequest == null, ErrorCode.PARAMS_ERROR,"请求参数不能为空");
+
+    UserAnswer userAnswer = new UserAnswer();
+    BeanUtil.copyProperties(userAnswerUpdateRequest,userAnswer);
+    userAnswerService.validUserAnswer(userAnswer);
+
+//    User loginUser = userService.getLoginUser(request);
+
+    try {
+        boolean b = userAnswerService.updateById(userAnswer);
+        if (!b) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "更新失败");
+        }
+    } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
+    return ResultUtils.success(true);
+}
 
 }
