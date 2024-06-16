@@ -1,4 +1,5 @@
 package com.zhang.zhangdada.service.impl;
+import java.util.Date;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
@@ -16,6 +17,21 @@ import org.springframework.stereotype.Service;
 public class UserAnswerServiceImpl extends ServiceImpl<UserAnswerMapper, UserAnswer>
     implements UserAnswerService {
 
+    @Override
+    public void validUserAnswer(UserAnswer userAnswer) {
+     Long appId = userAnswer.getAppId();
+     Integer appType = userAnswer.getAppType();
+     Integer scoringStrategy = userAnswer.getScoringStrategy();
+     String choices = userAnswer.getChoices();
+     Long resultId = userAnswer.getResultId();
+     String resultName = userAnswer.getResultName();
+     String resultDesc = userAnswer.getResultDesc();
+     String resultPicture = userAnswer.getResultPicture();
+     Integer resultScore = userAnswer.getResultScore();
+     Long userId = userAnswer.getUserId();
+
+
+    }
 }
 
 

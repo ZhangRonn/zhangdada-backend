@@ -10,4 +10,5 @@ import com.zhang.zhangdada.model.entity.UserAnswer;
 */
 public interface UserAnswerService extends IService<UserAnswer> {
 
+    void validUserAnswer(UserAnswer userAnswer);
 }

@@ -1,6 +1,7 @@
 package com.zhang.zhangdada.controller;
 import java.util.List;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.zhang.zhangdada.annotation.AuthCheck;
 import com.zhang.zhangdada.common.ResultUtils;
@@ -59,8 +60,14 @@ public class QuestionController {
 
     @DeleteMapping("/deleteQuestion")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Boolean> deleteQuestion(@RequestParam Long questionId) {
+    public BaseResponse<Boolean> deleteQuestion(@RequestParam Long questionId,HttpServletRequest request) {
         ThrowUtils.throwIf(questionId == null, ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+
+        Question oldQuestion = questionService.getById(questionId);
+
+        ThrowUtils.throwIf(BeanUtil.isEmpty(oldQuestion)||loginUser.getId()!=oldQuestion.getUserId(),
+                ErrorCode.NO_AUTH_ERROR, "无权限删除");
 
         boolean b = questionService.removeById(questionId);
         ThrowUtils.throwIf(!b, ErrorCode.SYSTEM_ERROR, "删除失败");
