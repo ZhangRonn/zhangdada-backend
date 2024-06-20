@@ -1,9 +1,9 @@
 
 -- 创建库
-create database if not exists yudada;
+create database if not exists zhangdada;
 
 -- 切换库
-use yudada;
+use zhangdada;
 
 -- 用户表
 create table if not exists user

@@ -20,8 +20,8 @@ public class MainApplication {
     public static void main(String[] args) {
         SpringApplication.run(MainApplication.class, args);
         System.out.println("启动成功啦啦！！！！！！！！！");
-        System.out.println("静姐！！！！！！！！！！！！！！");
-
+        System.out.println("zhangzhang!!!!!!!!!!");
+        System.out.println("zhangzhang!!!!!!!!!!");
     }
 
 }
