@@ -21,7 +21,7 @@ public class MainApplication {
         SpringApplication.run(MainApplication.class, args);
         System.out.println("启动成功啦啦！！！！！！！！！");
         System.out.println("zhangzhang!!!!!!!!!!");
-        System.out.println("zhangzhang!!!!!!!!!!");
+
     }
 
 }
